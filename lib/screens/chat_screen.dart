@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ChatScreen extends StatefulWidget {
   static const String screenid = 'chat_screen';
+  late User loggInuser;
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
@@ -57,7 +58,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 Navigator.pop(context);
               }),
         ],
-        title: Text('⚡️Chat'),
+        title: Text('⚡️CHATBOX'),
         backgroundColor: Colors.lightBlueAccent,
       ),
       body: SafeArea(
@@ -74,14 +75,21 @@ class _ChatScreenState extends State<ChatScreen> {
                     for (var message in messages ?? []) {
                       final messageText = message.get('text');
                       final messageSender = message.get('sender');
+//
+                      final currentuser = loggInuser.email;
 
                       final messagesbubbles =
-                      bubblebutton(text: messageText, sender: messageSender);
+                      bubblebutton(
+                          text: messageText,
+                          sender: messageSender,
+                        nowuser: currentuser == messageSender,
+                      );
 
                       messageWigdets.add(messagesbubbles);
                     }
                     return Expanded(
                       child: ListView(
+                        reverse: true,
                           padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 20.0),
                           children:messageWigdets
                       ),
@@ -129,17 +137,18 @@ class _ChatScreenState extends State<ChatScreen> {
 
 class bubblebutton extends StatelessWidget {
 
-  bubblebutton({required this.text,required this.sender});
+  bubblebutton({required this.text,required this.sender,required this.nowuser});
 
   final String text;
   final String sender;
+  final bool nowuser;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(10.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: nowuser? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
         Text(sender,
           style: TextStyle(
@@ -150,7 +159,7 @@ class bubblebutton extends StatelessWidget {
         Material(
           elevation: 5.0,
           borderRadius: BorderRadius.circular(30.0),
-          color: Colors.lightBlueAccent,
+          color: nowuser? Colors.lightBlueAccent : Colors.blue,
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: 10.0,horizontal: 20.0),
               child: Text(text,
